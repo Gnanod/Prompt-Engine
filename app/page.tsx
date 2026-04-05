@@ -181,27 +181,31 @@ export default function HomePage() {
           <aside style={{ display: 'grid', gap: 20 }}>
             <section style={{ background: '#10192b', border: '1px solid #24314d', borderRadius: 18, padding: 20 }}>
               <h2 style={{ marginTop: 0 }}>Character Pool</h2>
-              {Object.entries(currentTemplate.groupedCharacters).map(([group, names]) => (
-                <div key={group} style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#88a6d8', marginBottom: 8 }}>{group}</div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {names.map((name) => (
-                      <span
-                        key={name}
-                        style={{
-                          background: '#17233b',
-                          border: '1px solid #30425f',
-                          borderRadius: 999,
-                          padding: '6px 10px',
-                          fontSize: 13,
-                        }}
-                      >
-                        {name}
-                      </span>
-                    ))}
+              {Object.entries(currentTemplate.groupedCharacters).map(
+                ([group, names]: [string, readonly string[]]) => (
+                  <div key={group} style={{ marginBottom: 16 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#88a6d8', marginBottom: 8 }}>
+                      {group}
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {names.map((name: string) => (
+                        <span
+                          key={name}
+                          style={{
+                            background: '#17233b',
+                            border: '1px solid #30425f',
+                            borderRadius: 999,
+                            padding: '6px 10px',
+                            fontSize: 13,
+                          }}
+                        >
+                          {name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </section>
 
             <section style={{ background: '#10192b', border: '1px solid #24314d', borderRadius: 18, padding: 20 }}>

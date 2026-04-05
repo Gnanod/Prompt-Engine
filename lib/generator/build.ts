@@ -1,62 +1,62 @@
-import { CATEGORY_TEMPLATES, CategoryKey } from './category-templates'
+import {CATEGORY_TEMPLATES, CategoryKey} from './category-templates'
 
-function pickOne<T>(items: readonly T[]): T {
-return items[Math.floor(Math.random() * items.length)]
+function pickOne<T extends readonly unknown[]>(items: T): T[number] {
+    return items[Math.floor(Math.random() * items.length)]
 }
 
 function pickTwoDistinct<T>(items: T[]): [T, T] {
-  const first = Math.floor(Math.random() * items.length)
-  let second = Math.floor(Math.random() * items.length)
-  while (second === first) second = Math.floor(Math.random() * items.length)
-  return [items[first], items[second]]
+    const first = Math.floor(Math.random() * items.length)
+    let second = Math.floor(Math.random() * items.length)
+    while (second === first) second = Math.floor(Math.random() * items.length)
+    return [items[first], items[second]]
 }
 
 function pickExtras<T>(items: readonly T[]): T[] {
-  const shuffled = [...items].sort(() => Math.random() - 0.5)
-  const count = Math.random() < 0.5 ? 1 : 2
-  return shuffled.slice(0, count)
+    const shuffled = [...items].sort(() => Math.random() - 0.5)
+    const count = Math.random() < 0.5 ? 1 : 2
+    return shuffled.slice(0, count)
 }
 
 async function sha256(input: string) {
-  const msgUint8 = new TextEncoder().encode(input)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+    const msgUint8 = new TextEncoder().encode(input)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 export async function buildUniqueCandidate(category: CategoryKey) {
-  const template = CATEGORY_TEMPLATES[category]
+    const template = CATEGORY_TEMPLATES[category]
 
-  if (!template) {
-    throw new Error(`Template not found for category: ${category}`)
-  }
+    if (!template) {
+        throw new Error(`Template not found for category: ${category}`)
+    }
 
-  const allCharacters = Object.values(template.groupedCharacters).flat()
-  const [person1, person2] = pickTwoDistinct([...allCharacters])
-  const extras = pickExtras(template.extras)
+    const allCharacters = Object.values(template.groupedCharacters).flat()
+    const [person1, person2] = pickTwoDistinct([...allCharacters])
+    const extras = pickExtras(template.extras)
 
     const themeSubtextPair = pickOne(template.themeSubtextPairs)
     const theme = themeSubtextPair[0]
     const subtext = themeSubtextPair[1]
-  const payload = {
-    category,
-    templateName: template.templateName,
-    theme,
-    subtext,
-    person1,
-    person2,
-    layout: pickOne(template.layoutRandomization),
-    visualStory: pickOne(template.visualStoryVariation),
-    lighting: pickOne(template.lightingRandomization),
-    colorStyle: pickOne(template.colorStyleRandomization),
-    role1: pickOne(template.leftRoleLabels),
-    role2: pickOne(template.rightRoleLabels),
-    extras,
-  }
+    const payload = {
+        category,
+        templateName: template.templateName,
+        theme,
+        subtext,
+        person1,
+        person2,
+        layout: pickOne(template.layoutRandomization),
+        visualStory: pickOne(template.visualStoryVariation),
+        lighting: pickOne(template.lightingRandomization),
+        colorStyle: pickOne(template.colorStyleRandomization),
+        role1: pickOne(template.leftRoleLabels),
+        role2: pickOne(template.rightRoleLabels),
+        extras,
+    }
 
-  const fingerprintHash = await sha256(JSON.stringify(payload))
+    const fingerprintHash = await sha256(JSON.stringify(payload))
 
-  const generatedPrompt = `${template.intro}
+    const generatedPrompt = `${template.intro}
 
 CORE RANDOMIZATION ENGINE:
 - Randomly selected TWO DISTINCT figures from the provided list
@@ -100,11 +100,11 @@ ${template.strictRules.map((x) => `- ${x}`).join('\n')}
 GOAL:
 ${template.goal}`
 
-  return {
-    template,
-    payload,
-    fingerprintHash,
-    generatedPrompt,
-    allCharacters,
-  }
+    return {
+        template,
+        payload,
+        fingerprintHash,
+        generatedPrompt,
+        allCharacters,
+    }
 }
